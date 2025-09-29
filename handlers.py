@@ -27,6 +27,7 @@ class SynthesizeHandler:
         Each line should be in format: A,B (replace A with B)
         """
         try:
+            self.dictionary = {}
             # Look for dictionary.csv in the current working directory
             dict_path = os.path.join(self.folder_path, "dictionary.csv")
             if os.path.exists(dict_path):
@@ -118,7 +119,6 @@ class SynthesizeHandler:
                 print(f"Warning: {txt_file_path} not found, skipping {file_path}")
                 return False
             
-            last_line = ""
             skip_line_index = 0
             txt_lines = []
             # Read the .txt file and wrap each line in <div> tags
@@ -126,10 +126,10 @@ class SynthesizeHandler:
                 for i in range(8):
                     line = next(f)
                     txt_lines.append(line)
-                    last_line = line.strip()
-                    if last_line == "手機掃碼閱讀":
+                    current_line = line.strip()
+                    if current_line == "手機掃碼閱讀":
                         skip_line_index = i
-                    if '章' in last_line:
+                    if '章' in current_line:
                         skip_line_index = i
                 txt_lines.extend(f.readlines())
             
