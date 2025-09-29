@@ -118,15 +118,26 @@ class SynthesizeHandler:
                 print(f"Warning: {txt_file_path} not found, skipping {file_path}")
                 return False
             
+            last_line = ""
+            skip_line_index = 0
+            txt_lines = []
             # Read the .txt file and wrap each line in <div> tags
             with open(txt_file_path, 'r', encoding='utf-8') as f:
-                for _ in range(8):
-                    next(f)
-                txt_lines = f.readlines()
+                for i in range(8):
+                    line = next(f)
+                    txt_lines.append(line)
+                    last_line = line.strip()
+                    if last_line == "手機掃碼閱讀":
+                        skip_line_index = i
+                    if '章' in last_line:
+                        skip_line_index = i
+                txt_lines.extend(f.readlines())
             
             # Wrap each line in <div> tags
             wrapped_content = ""
-            for line in txt_lines:
+            for i, line in enumerate(txt_lines):
+                if(skip_line_index >= i):
+                    continue
                 line = line.strip()
                 if line:  # Only process non-empty lines
                     if wrapped_content == "":
@@ -141,7 +152,7 @@ class SynthesizeHandler:
             # Replace content between <main> tags
             # Use regex to find and replace content between <main> and </main>
             main_pattern = r'<main[^>]*>.*?</main>'
-            main_replacement = f'<article id="content" style="line-height: 2.4; outline: 0px; font-size: larger; padding-left: 10%; padding-right: 10%;" class="scrollbox" tabindex="1"><main>\n{wrapped_content}</main></article>'
+            main_replacement = f'<article id="content" style="line-height: 2.4; outline: 0px; font-size: x-large; padding-left: 10%; padding-right: 10%;" class="scrollbox" tabindex="1"><main>\n{wrapped_content}</main></article>'
             
             # Find the main tag pattern
             match = re.search(main_pattern, html_content, re.DOTALL | re.IGNORECASE)
